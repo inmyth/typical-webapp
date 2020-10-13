@@ -47,7 +47,7 @@ Controller however is usually integrated with server framework, it's probably no
 ## Notes 
 - Reader Monad
 
-Why Reader ? It helps organize dependency flow which means easier testing and easier time to visualize the software structure. The latter often happens when using dependency injection.  
+Why Reader ? It helps organize dependency flow which means easier testing and easier time to visualize the software structure. The latter often becomes a problem when using dependency injection.  
 Use Reader for all things config, repo(inMem or realDb), executor, (hopefully) controller. Bring configs up to application level (server, http clients don't need to be in reader and are the final user).
 
 - [don't make useless  trait](https://github.com/alexandru/scala-best-practices/blob/master/sections/2-language-rules.md#24-should-not-define-useless-traits)
