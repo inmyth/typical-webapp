@@ -2,15 +2,15 @@ package mbcu.me.repos.user
 
 import mbcu.me.domain.{Done, User}
 import monix.eval.Task
+import monix.execution.Scheduler
 
 import scala.collection.concurrent.TrieMap
-import scala.concurrent.Future
 
 private[user] object InMemoryDB {
   private val db: TrieMap[User.Id, User] = TrieMap.empty
 }
 
-private[user] class InMemoryDB extends Repo {
+private[user] class InMemoryDB(scheduler: Scheduler) extends Repo(scheduler) {
   import InMemoryDB._
 
   override def insert(user: User): Task[Done] =
