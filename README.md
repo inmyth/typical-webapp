@@ -9,6 +9,9 @@ A typical structure to be used in web-app project.
     - Implicit conversion
     - EitherT (probably dropped as it doesn't play well with Task)
 - Adheres to basic DDD
+- Simulates unstable network
+    - Unstable implementation can be removed in realistic application. Network error, etc is already encapsulated in db query so we can do error type matching. 
+- Has in-memory repository for testing
 - Has the following desired structure
 All hierarchy of application is represented as chain of Reader. Server is outside as it's not tested and ideally should be easy to change. 
 Controller however is usually integrated with server framework, it's probably not possible to abstract it. 
@@ -50,7 +53,6 @@ Use Reader for all things config, repo(inMem or realDb), executor, (hopefully) c
 - [don't make useless  trait](https://github.com/alexandru/scala-best-practices/blob/master/sections/2-language-rules.md#24-should-not-define-useless-traits)
 
 Always have a reason for making it. Repo needs trait as it implements at least one for default and for for in-mem. Service needs trait for default and for unstable implementations. 
-    - Unstable implementation can be removed in realistic application. Network error, etc is already encapsulated in db query so we can do error type matching. 
 
 - package object
 
