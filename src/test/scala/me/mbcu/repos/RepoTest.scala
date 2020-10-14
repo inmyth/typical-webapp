@@ -10,11 +10,10 @@ class RepoTest extends AsyncFlatSpec {
   val config      = Config(EnvConfig(failureProbability = 0.5), ExecutorsConfig(ComputationScheduler(1)), Services.UNSTABLE)
   implicit val ec = config.executorsConfig.computationScheduler.ec
 
-  val repo        = Repositories.fromConfig.run(config)
-  val userId      = User.Id(1)
-  val userName    = User.UserName("martin")
-  val user        = User(userId, userName)
-  val newUserName = User.UserName("utama")
+  val repo     = Repositories.fromConfig.run(config)
+  val userId   = User.Id(1)
+  val userName = User.UserName("martin")
+  val user     = User(userId, userName)
 
   behavior of "Repository"
   it should "save and retrieve new user" in {

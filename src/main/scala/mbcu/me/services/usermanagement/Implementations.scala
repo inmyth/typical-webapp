@@ -1,6 +1,5 @@
 package mbcu.me.services.usermanagement
 
-import mbcu.me.config.Config.EnvConfig
 import mbcu.me.domain.User.UserName
 import mbcu.me.domain.{Done, User}
 import mbcu.me.repos.UserRepository
@@ -14,12 +13,14 @@ object Implementations {
 
   def default(userRepository: UserRepository)(implicit ec: Scheduler): Service[Task] = new Default(userRepository)
 
-  def unstable(underlying: Service[Task], failureProbability: Double)(implicit ec: Scheduler) =
+  def unstable(underlying: Service[Task], failureProbability: Double)(implicit ec: Scheduler): Service[Task] =
     new Unstable(underlying, failureProbability)
 }
 
 final class Default private[usermanagement] (userRepository: UserRepository)(implicit ec: Scheduler)
     extends Service[Task] {
+
+  override def insert(user: User): Task[Done] = userRepository.insert(user)
 
   override def get(id: User.Id): Task[User] =
     for {
@@ -41,19 +42,20 @@ final class Default private[usermanagement] (userRepository: UserRepository)(imp
 
 object Unstable {
 
-  private def failWithProbability[A](probability: Double)(f: Task[A]) =
-    if (Random.nextDouble < probability) Task.raiseError(new Exception) else f
-
+  private def failWithProbability[A](probability: Double)(f: Task[A]): Task[A] =
+    if (Random.nextDouble < probability) Task.raiseError(Error.System(new Throwable("#failWithProbability"))) else f
 }
 
 final class Unstable private[usermanagement] (underlying: Service[Task], failureProbability: Double)(implicit
   ec: Scheduler
 ) extends Service[Task] {
 
-  private def fail[A](f: Task[A]): Task[A] = failWithProbability(failureProbability)(f)
+  private def mayFail[A](f: Task[A]) = failWithProbability(failureProbability)(f)
 
-  override def get(id: User.Id): Task[User] = fail(underlying.get(id))
+  override def get(id: User.Id): Task[User] = mayFail(underlying.get(id))
 
-  override def changeUserName(id: User.Id, newName: UserName): Task[Done] = fail(underlying.changeUserName(id, newName))
+  override def changeUserName(id: User.Id, newName: UserName): Task[Done] =
+    mayFail(underlying.changeUserName(id, newName))
 
+  override def insert(user: User): Task[Done] = mayFail(underlying.insert(user))
 }

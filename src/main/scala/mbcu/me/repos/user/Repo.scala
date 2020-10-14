@@ -1,7 +1,7 @@
 package mbcu.me.repos.user
 
-import mbcu.me.domain.{Done, User}
 import mbcu.me.domain.User.UserName
+import mbcu.me.domain.{Done, User}
 import monix.eval.Task
 import monix.execution.Scheduler
 

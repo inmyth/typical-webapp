@@ -5,14 +5,16 @@ A typical structure to be used in web-app project.
 - Create easy-to-test template. 
 - Restrict the most FP stuff to use
     - Reader
-    - Writer 
+    - (from here not so important)
     - Implicit conversion
-    - EitherT (probably dropped as it doesn't play well with Task)
+    - Either (probably dropped as it doesn't play well with Task)
+    - Writer (this is monadic logging)
 - Adheres to basic DDD
 - Simulates unstable network
     - Unstable implementation can be removed in realistic application. Network error, etc is already encapsulated in db query so we can do error type matching. 
 - Has in-memory repository for testing
 - Has the following desired structure
+
 All hierarchy of application is represented as chain of Reader. Server is outside as it's not tested and ideally should be easy to change. 
 Controller however is usually integrated with server framework, it's probably not possible to abstract it. 
 
@@ -47,8 +49,8 @@ Controller however is usually integrated with server framework, it's probably no
 ## Notes 
 - Reader Monad
 
-Why Reader ? It helps organize dependency flow which means easier testing and easier time to visualize the software structure. The latter often becomes a problem when using dependency injection.  
-Use Reader for all things config, repo(inMem or realDb), executor, (hopefully) controller. Bring configs up to application level (server, http clients don't need to be in reader and are the final user).
+Why Reader ? It helps organize dependency graph which means easier testing and easier time to visualize the software structure. The latter often becomes a problem when working with dependency injection.  
+Use Reader for all things config, repo(inMem or realDb), executor, (hopefully) controller. Bring configs up to application level (server, http clients don't need to use reader and are the final consumer).
 
 - [don't make useless  trait](https://github.com/alexandru/scala-best-practices/blob/master/sections/2-language-rules.md#24-should-not-define-useless-traits)
 
@@ -62,12 +64,12 @@ Now user.SomeImpl can be aliased with UserSomeImpl whose definition is stored in
 
 - executor
 
-Ideally concurrent computation will use a variety of schedulers / ec. ExecutorConfig will store ec definitions to be used in services or repo. 
+Ideally concurrent process will use a variety of schedulers / execution context. ExecutorConfig will store ec definitions to be used in services or repo. 
 The current template only has in-memory db which probably requires only computation ec. 
 
 - network error, etc
 
-In realistic application handling should be done on repository level (i.e result should be `[A Either Error]` `where error can be NotFound or NetworkError). Currently it's not handled as it's using unstable service which simulates these errors.  
+Handling should be done on repository level (i.e result should be `[A Either Error]` where error can be NotFound or NetworkError). Currently it's not handled as it's using unstable service which simulates these errors.  
 
 - using first order type F[_]
 

@@ -6,4 +6,7 @@ package object services {
 
   type UserManagement[F[_]] = usermanagement.Service[F]
   val UserManagement: Implementations.type = usermanagement.Implementations
+
+  type UserManagementError = usermanagement.Error
+
 }
