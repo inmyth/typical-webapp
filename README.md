@@ -58,6 +58,8 @@ Always have a reason for making it. Repo needs trait as it implements at least o
 
 - package object
 
+WARNING: package object will be removed in Scala 3.0.
+
 Think of it as index.html in a Node dir. It bridges its content with outside by giving the stuff inside type alias.
 Benefit: to avoid confusion when importing. Imports can have naming collision like me.mbcu.repo.user.SomeImpl and mbcu.repo.purchase.SomeImpl. 
 Now user.SomeImpl can be aliased with UserSomeImpl whose definition is stored in this file.   
