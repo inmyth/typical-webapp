@@ -1,8 +1,6 @@
-package mbcu.me.domain
+package mbcu.me.domain.models.usermanagement
 
-import mbcu.me.domain.User.UserName
-
-case class User(id: User.Id, userName: UserName)
+case class User(id: User.Id, userName: User.UserName)
 
 object User {
 

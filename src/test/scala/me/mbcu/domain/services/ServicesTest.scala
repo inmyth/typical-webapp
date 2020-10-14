@@ -1,9 +1,10 @@
-package me.mbcu.services
+package me.mbcu.domain.services
 
 import mbcu.me.config.Config.ExecutorsConfig.ComputationScheduler
 import mbcu.me.config.Config.{Config, EnvConfig, ExecutorsConfig, Services}
-import mbcu.me.domain.User
-import mbcu.me.services.UserManagementError
+import mbcu.me.domain.models.usermanagement
+import mbcu.me.domain.models.usermanagement.User
+import mbcu.me.domain.services.services.UserManagementError
 import org.scalatest.AsyncFlatSpec
 
 class ServicesTest extends AsyncFlatSpec {
@@ -14,7 +15,7 @@ class ServicesTest extends AsyncFlatSpec {
   val services = Services.fromConfig.run(config)
   val userId   = User.Id(1)
   val userName = User.UserName("martin")
-  val user     = User(userId, userName)
+  val user     = usermanagement.User(userId, userName)
 
   behavior of "Unstable Repository"
 

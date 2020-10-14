@@ -1,0 +1,14 @@
+package mbcu.me.domain.services.usermanagement
+
+import mbcu.me.domain.models.usermanagement.User
+import mbcu.me.domain.shared.Done
+
+trait Service[F[A]] {
+
+  def insert(user: User): F[Done]
+
+  def get(id: User.Id): F[User]
+
+  def changeUserName(id: User.Id, newName: User.UserName): F[Done]
+
+}

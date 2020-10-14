@@ -1,9 +1,10 @@
-package mbcu.me.services.usermanagement
+package mbcu.me.domain.services.usermanagement
 
-import mbcu.me.domain.User.UserName
-import mbcu.me.domain.{Done, User}
-import mbcu.me.repos.UserRepository
-import mbcu.me.services.usermanagement.Unstable.failWithProbability
+import mbcu.me.domain.models.usermanagement.User
+import mbcu.me.domain.models.usermanagement.User.UserName
+import mbcu.me.domain.services.services.UserRepository
+import mbcu.me.domain.services.usermanagement.Unstable.failWithProbability
+import mbcu.me.domain.shared.Done
 import monix.eval.Task
 import monix.execution.Scheduler
 

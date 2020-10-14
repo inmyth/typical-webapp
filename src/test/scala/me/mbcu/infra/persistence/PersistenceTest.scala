@@ -1,11 +1,12 @@
-package me.mbcu.repos
+package me.mbcu.infra.persistence
 
+import mbcu.me.domain.models.usermanagement
 import org.scalatest._
 
-class RepoTest extends AsyncFlatSpec {
-  import mbcu.me.config.Config.{Config, EnvConfig, ExecutorsConfig, Repositories, Services}
+class PersistenceTest extends AsyncFlatSpec {
   import mbcu.me.config.Config.ExecutorsConfig.ComputationScheduler
-  import mbcu.me.domain.User
+  import mbcu.me.config.Config._
+  import mbcu.me.domain.models.usermanagement.User
 
   val config      = Config(EnvConfig(failureProbability = 0.5), ExecutorsConfig(ComputationScheduler(1)), Services.UNSTABLE)
   implicit val ec = config.executorsConfig.computationScheduler.ec
@@ -13,7 +14,7 @@ class RepoTest extends AsyncFlatSpec {
   val repo     = Repositories.fromConfig.run(config)
   val userId   = User.Id(1)
   val userName = User.UserName("martin")
-  val user     = User(userId, userName)
+  val user     = usermanagement.User(userId, userName)
 
   behavior of "Repository"
   it should "save and retrieve new user" in {
