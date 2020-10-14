@@ -82,6 +82,7 @@ The benefit is unclear as realistically we can only expect F to be Future or Tas
 - ddd
 
 [Structure](https://web.archive.org/web/20201014145232/https://terasolunaorg.github.io/guideline/1.0.x/en/Overview/ApplicationLayering.html) follows this approach. 
+
     - controller should belong in application
     - messaging should go to infra
     - application is a thin layer connecting UI and domain 
