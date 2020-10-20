@@ -1,11 +1,14 @@
 package mbcu.me.config
 
 import cats.data.Reader
+import com.amazonaws.auth.AWSCredentialsProvider
 import mbcu.me.config.Config.Services.{DEFAULT, ServiceMode, UNSTABLE}
 import mbcu.me.domain.services.services.{UserManagement, UserRepository}
 import monix.eval.Task
 import monix.execution.ExecutionModel.AlwaysAsyncExecution
 import monix.execution.Scheduler
+import pureconfig._
+import pureconfig.generic.auto._
 
 object Config {
 
@@ -27,12 +30,19 @@ object Config {
 
   final case class EnvConfig(failureProbability: Double)
 
+  final case class AWSS3Config(region: String, credentials: Option[S3Credentials], bucket: String)
+  final case class S3Credentials(accessKey: String, secret: String)
+
   object Repositories {
-    val fromConfig: Reader[Config, Repositories] = Reader(p => Repositories(p.executorsConfig))
+    val fromConfig: Reader[Config, Repositories] = Reader(Repositories(_))
   }
 
-  final case class Repositories(executorsConfig: ExecutorsConfig) {
-    val userRepo: UserRepository = UserRepository.inMemory(executorsConfig.computationScheduler.ec)
+  final case class Repositories(config: Config) {
+    import awscala.Credentials
+    import awscala.s3.S3
+
+    val userRepo: UserRepository = UserRepository.inMemory(config.executorsConfig.computationScheduler.ec)
+
   }
 
   object Services {
