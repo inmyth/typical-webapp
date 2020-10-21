@@ -2,7 +2,7 @@ package mbcu.me.config
 
 import cats.data.Reader
 import mbcu.me.config.Config.Services.{DEFAULT, ServiceMode, UNSTABLE}
-import mbcu.me.domain.services.services.{UserManagement, UserRepository}
+import mbcu.me.domain.services.{UserManagement, UserRepository}
 import monix.eval.Task
 import monix.execution.ExecutionModel.AlwaysAsyncExecution
 import monix.execution.Scheduler

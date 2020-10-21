@@ -1,4 +1,4 @@
-package mbcu.me.domain.services
+package mbcu.me.domain
 
 package object services {
 
