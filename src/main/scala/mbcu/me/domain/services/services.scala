@@ -10,4 +10,7 @@ package object services {
   type UserRepository = usermanagement.Repo
   val UserRepository = usermanagement.Repo
 
+  type FileRepository = usermanagement.FileRepo
+  val FileRepository = usermanagement.FileRepo
+
 }
