@@ -1,7 +1,7 @@
-package mbcu.me.domain.services.usermanagement
+package mbcu.me.domain.services.certivmanagement
 
 sealed trait Error extends Throwable
-private[usermanagement] object Error {
+private[certivmanagement] object Error {
   final case object Exists                       extends Error
   final case object NotFound                     extends Error
   final case object Active                       extends Error

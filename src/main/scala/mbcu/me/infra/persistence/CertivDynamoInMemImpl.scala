@@ -1,19 +1,19 @@
 package mbcu.me.infra.persistence
 
 import mbcu.me.domain.models.usermanagement.User
-import mbcu.me.domain.services.UserRepository
+import mbcu.me.domain.services.CertivDynamoRepository
 import mbcu.me.domain.shared.Done
 import monix.eval.Task
 import monix.execution.Scheduler
 
 import scala.collection.concurrent.TrieMap
 
-private[persistence] object UserInMemoryDB {
+private[persistence] object CertivDynamoInMemImpl {
   private val db: TrieMap[User.Id, User] = TrieMap.empty
 }
 
-private[persistence] class UserInMemoryDB(scheduler: Scheduler) extends UserRepository(scheduler) {
-  import UserInMemoryDB._
+private[persistence] class CertivDynamoInMemImpl(scheduler: Scheduler) extends CertivDynamoRepository(scheduler) {
+  import CertivDynamoInMemImpl._
 
   override def insert(user: User): Task[Done] =
     Task.now {

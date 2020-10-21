@@ -1,15 +1,17 @@
 package mbcu.me.config
 
+import awscala.Region
+import awscala.s3.{Bucket, S3}
 import cats.data.Reader
-import mbcu.me.config.Config.Services.{DEFAULT, ServiceMode, UNSTABLE}
-import mbcu.me.domain.services.{UserManagement, UserRepository}
+import mbcu.me.config.Config.EnvConfig.RepoMode
+import mbcu.me.domain.services.{CertivDynamoRepository, CertivFileRepository, CertivManagement}
 import monix.eval.Task
 import monix.execution.ExecutionModel.AlwaysAsyncExecution
 import monix.execution.Scheduler
 
 object Config {
 
-  final case class Config(envConfig: EnvConfig, executorsConfig: ExecutorsConfig, serviceMode: ServiceMode)
+  final case class Config(envConfig: EnvConfig, executorsConfig: ExecutorsConfig, repositoryConfig: RepositoryConfig)
 
   final case class ExecutorsConfig(computationScheduler: ExecutorsConfig.ComputationScheduler)
 
@@ -25,10 +27,29 @@ object Config {
 
   }
 
-  final case class EnvConfig(failureProbability: Double)
+  object EnvConfig {
 
-  final case class S3Config(region: String, credentials: Option[S3Credentials], bucket: String)
-  final case class S3Credentials(accessKey: String, secret: String)
+    sealed trait RepoMode
+    final object InMem extends RepoMode
+    final object Real  extends RepoMode
+  }
+
+  final case class EnvConfig(repoMode: RepoMode)
+
+  final case class RepositoryConfig(
+    s3Config: S3Config,
+    dynamoConfig: DynamoConfig,
+    sqlConfig: SQLConfig,
+    inMemConfig: InMemConfig
+  )
+
+  final case class S3Config(region: Region, bucket: Bucket)
+
+  final case class DynamoConfig(region: Region)
+
+  final case class SQLConfig(region: Region)
+
+  final case class InMemConfig(failureProbability: Double)
 
   object Repositories {
     val fromConfig: Reader[Config, Repositories] = Reader(Repositories(_))
@@ -36,9 +57,15 @@ object Config {
 
   final case class Repositories(config: Config) {
 
-    val userRepo: UserRepository = UserRepository.inMemory(config.executorsConfig.computationScheduler.ec)
+    val certivDynamo: CertivDynamoRepository =
+      CertivDynamoRepository.inMem(config.executorsConfig.computationScheduler.ec)
 
-    val
+    val certivStorage: CertivFileRepository = {
+      val ec     = ExecutorsConfig.ecIO
+      val region = config.repositoryConfig.s3Config.region
+      val s3     = S3.at(region)
+      CertivFileRepository.s3(ec, s3, config.repositoryConfig.s3Config)
+    }
 
   }
 
@@ -47,27 +74,16 @@ object Config {
 
     def fromConfig: Reader[Config, Services] =
       for {
-        repo   <- Repositories.fromConfig
         config <- configReader
+        repo   <- Repositories.fromConfig
       } yield Services(config, repo)
-
-    sealed trait ServiceMode
-    case object DEFAULT  extends ServiceMode
-    case object UNSTABLE extends ServiceMode
   }
 
   final case class Services(config: Config, repositories: Repositories) {
     private val ecComp: Scheduler = config.executorsConfig.computationScheduler.ec
 
-    val userManagement: UserManagement[Task] = config.serviceMode match {
-      case DEFAULT => UserManagement.default(repositories.userRepo)(ecComp)
-      case UNSTABLE =>
-        UserManagement.unstable(
-          UserManagement.default(repositories.userRepo)(ecComp),
-          config.envConfig.failureProbability
-        )(ecComp)
-    }
-
+    val certivManagement: CertivManagement[Task] =
+      CertivManagement.default(repositories.certivDynamo, repositories.certivStorage)(ecComp)
   }
 
   object Application {

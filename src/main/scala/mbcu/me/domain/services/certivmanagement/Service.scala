@@ -1,4 +1,4 @@
-package mbcu.me.domain.services.usermanagement
+package mbcu.me.domain.services.certivmanagement
 
 import mbcu.me.domain.models.usermanagement.User
 import mbcu.me.domain.shared.Done

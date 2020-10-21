@@ -2,15 +2,15 @@ package mbcu.me.domain
 
 package object services {
 
-  type UserManagement[F[_]] = mbcu.me.domain.services.usermanagement.Service[F]
-  val UserManagement: usermanagement.Implementations.type = usermanagement.Implementations
+  type CertivManagement[F[_]] = mbcu.me.domain.services.certivmanagement.Service[F]
+  val CertivManagement: certivmanagement.Implementations.type = certivmanagement.Implementations
 
-  type UserManagementError = mbcu.me.domain.services.usermanagement.Error
+  type CertivManagementError = mbcu.me.domain.services.certivmanagement.Error
 
-  type UserRepository = usermanagement.Repo
-  val UserRepository = usermanagement.Repo
+  type CertivDynamoRepository = certivmanagement.DynamoRepo
+  val CertivDynamoRepository = certivmanagement.DynamoRepo
 
-  type FileRepository = usermanagement.FileRepo
-  val FileRepository = usermanagement.FileRepo
+  type CertivFileRepository = certivmanagement.FileRepo
+  val CertivFileRepository = certivmanagement.FileRepo
 
 }

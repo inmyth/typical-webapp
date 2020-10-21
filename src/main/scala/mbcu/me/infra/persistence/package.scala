@@ -2,7 +2,10 @@ package mbcu.me.infra
 
 package object persistence {
 
-  type FakeUserDb = persistence.UserInMemoryDB
-  val FakeUserDb = persistence.UserInMemoryDB
+  type CertivDynamoInMem = persistence.CertivDynamoInMemImpl
+  val CertivDynamoInMem = persistence.CertivDynamoInMemImpl
+
+  type CertivFileStorage = persistence.CertivS3Impl
+  val CertivFileStorage = persistence.CertivS3Impl
 
 }
