@@ -9,8 +9,6 @@ import mbcu.me.domain.services.{CertivDynamoRepository, CertivFileRepository, Ce
 import monix.eval.Task
 import monix.execution.ExecutionModel.AlwaysAsyncExecution
 import monix.execution.Scheduler
-import pureconfig.generic.auto._
-import pureconfig._
 
 object Config {
 

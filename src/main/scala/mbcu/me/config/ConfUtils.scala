@@ -12,10 +12,7 @@ object ConfUtils {
 
   implicit val awsS3BucketConferter = new ConfigReader[Bucket] {
     def from(cur: ConfigCursor) = {
-      cur.asObjectCursor.map(s => {
-        val x = s.objValue.get("name").unwrapped().asInstanceOf[String]
-        Bucket(x)
-      })
+      cur.asConfigValue.map(s => Bucket(s.unwrapped().asInstanceOf[String]))
     }
   }
 
@@ -36,17 +33,5 @@ object ConfUtils {
 
     }
   }
-
-//  implicit val awsRegionConferter = new ConfigReader[Region] {
-//    def from(cur: ConfigCursor) = {
-//      cur.asConfigValue.map(s => {
-//        val x = s.unwrapped().asInstanceOf[String]
-//        Try(Option(Region(x)).get) match {
-//          case Success(value) => value
-//          case Failure(_)     => throw new IllegalArgumentException("AWS Region not recognized")
-//        }
-//      })
-//    }
-//  }
 
 }

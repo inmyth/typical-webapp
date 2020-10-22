@@ -1,22 +1,17 @@
 package mbcu.me
 
-import awscala.Region
-import awscala.s3.Bucket
-import mbcu.me.config.Config.ExecutorsConfig.ComputationScheduler
-import mbcu.me.config.Config.RepositoryConfig.{DynamoConfig, InMemConfig, S3Config, SQLConfig}
-import mbcu.me.config._
-import pureconfig.ConfigSource
-
-import scala.util.{Failure, Success, Try}
+import mbcu.me.config.Config.Config
+import mbcu.me.config.Config.RepositoryConfig.S3Config
 
 object Main extends App {
   //  val config = Config(EnvConfig(failureProbability = 0.5), ExecutorsConfig(ComputationScheduler(1)), Services.UNSTABLE)
 //  val app    = Application.fromConfig.run(config)
 
+  import mbcu.me.config.ConfUtils._
   import pureconfig._
   import pureconfig.generic.auto._
 
-  val x = ConfigSource.default.load[DynamoConfig]
+  val x = ConfigSource.default.load[Config]
 
   println(x)
 
