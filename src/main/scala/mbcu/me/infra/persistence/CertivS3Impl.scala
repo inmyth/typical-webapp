@@ -3,7 +3,7 @@ package mbcu.me.infra.persistence
 import java.io.File
 
 import awscala.s3.S3
-import mbcu.me.config.Config.S3Config
+import mbcu.me.config.Config.RepositoryConfig.S3Config
 import mbcu.me.domain.services.CertivFileRepository
 import mbcu.me.domain.shared.Done
 import monix.eval.Task

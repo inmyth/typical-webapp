@@ -1,7 +1,7 @@
 package mbcu.me.domain.services.certivmanagement
 
 import awscala.s3.S3
-import mbcu.me.config.Config.S3Config
+import mbcu.me.config.Config.RepositoryConfig.S3Config
 import mbcu.me.domain.shared.Done
 import mbcu.me.infra.persistence.CertivFileStorage
 import monix.eval.Task

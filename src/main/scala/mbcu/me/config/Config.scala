@@ -4,14 +4,15 @@ import awscala.Region
 import awscala.s3.{Bucket, S3}
 import cats.data.Reader
 import mbcu.me.config.Config.EnvConfig.RepoMode
+import mbcu.me.config.Config.RepositoryConfig.{DynamoConfig, InMemConfig, S3Config, SQLConfig}
 import mbcu.me.domain.services.{CertivDynamoRepository, CertivFileRepository, CertivManagement}
 import monix.eval.Task
 import monix.execution.ExecutionModel.AlwaysAsyncExecution
 import monix.execution.Scheduler
+import pureconfig.generic.auto._
+import pureconfig._
 
 object Config {
-
-  final case class Config(envConfig: EnvConfig, executorsConfig: ExecutorsConfig, repositoryConfig: RepositoryConfig)
 
   final case class ExecutorsConfig(computationScheduler: ExecutorsConfig.ComputationScheduler)
 
@@ -36,6 +37,17 @@ object Config {
 
   final case class EnvConfig(repoMode: RepoMode)
 
+  object RepositoryConfig {
+
+    final case class S3Config(region: Region, bucket: Bucket)
+
+    final case class DynamoConfig(region: Region)
+
+    final case class SQLConfig(region: Region)
+
+    final case class InMemConfig(failureProbability: Double)
+  }
+
   final case class RepositoryConfig(
     s3Config: S3Config,
     dynamoConfig: DynamoConfig,
@@ -43,13 +55,7 @@ object Config {
     inMemConfig: InMemConfig
   )
 
-  final case class S3Config(region: Region, bucket: Bucket)
-
-  final case class DynamoConfig(region: Region)
-
-  final case class SQLConfig(region: Region)
-
-  final case class InMemConfig(failureProbability: Double)
+  final case class Config(envConfig: EnvConfig, executorsConfig: ExecutorsConfig, repositoryConfig: RepositoryConfig)
 
   object Repositories {
     val fromConfig: Reader[Config, Repositories] = Reader(Repositories(_))
