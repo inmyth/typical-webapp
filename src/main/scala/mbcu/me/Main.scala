@@ -1,47 +1,29 @@
 package mbcu.me
 
-import mbcu.me.config.Config.Config
-import mbcu.me.config.Config.RepositoryConfig.S3Config
+import java.io.File
+
+import mbcu.me.config.Config.{Config, ExecutorsConfig, Repositories}
+import mbcu.me.domain.services.certivmanagement.FileRepo.S3Path
+import pureconfig._
+import pureconfig.generic.auto._
+import mbcu.me.config.ConfUtils._
+import scala.concurrent.Await
+import scala.concurrent.duration.DurationInt
 
 object Main extends App {
-  //  val config = Config(EnvConfig(failureProbability = 0.5), ExecutorsConfig(ComputationScheduler(1)), Services.UNSTABLE)
-//  val app    = Application.fromConfig.run(config)
 
-  import mbcu.me.config.ConfUtils._
-  import pureconfig._
-  import pureconfig.generic.auto._
+  val config = ConfigSource.default.load[Config]
 
-  val x = ConfigSource.default.load[Config]
+  config match {
+    case Right(value) => {
+      val x = Repositories.fromConfig(value)
 
-  println(x)
+      val z = x.certivStorage.put(S3Path("aaa", "b.txt"), new File("README.md")).runToFuture(ExecutorsConfig.ecIO)
+      Await.result(z, 3.seconds)
+//      x.certivStorage.Application.fromConfig.run(value)
 
-}
-/*
-
-env-config {
-  repo-mode {
-          type : "in-mem"
-
+      print("aaaaa")
+    }
+    case Left(value) => println(value)
   }
 }
-executors-config {
-    computation-scheduler {
-        parallellism : 1
-    }
-}
-repository-config {
-    s3-config {
-        region : "us-east-1"
-        bucket : "dev-certiv"
-    }
-    dynamo-config {
-        region : "us-east-1"
-    }
-    sqlconfig {
-        region : "us-east-1"
-    }
-    in-mem-config{
-        failure-probability : 0.5
-    }
-}
- */
