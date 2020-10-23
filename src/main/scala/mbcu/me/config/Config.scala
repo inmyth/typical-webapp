@@ -5,6 +5,7 @@ import awscala.s3.{Bucket, S3}
 import cats.data.Reader
 import mbcu.me.config.Config.EnvConfig.RepoMode
 import mbcu.me.config.Config.RepositoryConfig.{DynamoConfig, InMemConfig, S3Config, SQLConfig}
+import mbcu.me.domain.services.certivmanagement.FileRepo.S3Path
 import mbcu.me.domain.services.{CertivDynamoRepository, CertivFileRepository, CertivManagement}
 import monix.eval.Task
 import monix.execution.ExecutionModel.AlwaysAsyncExecution
@@ -37,7 +38,9 @@ object Config {
 
   object RepositoryConfig {
 
-    final case class S3Config(region: Region, bucket: Bucket)
+    final case class S3Config(region: Region, bucket: Bucket, iamTestFileName: String) {
+      val iamTestFilePath = S3Path(None, iamTestFileName)
+    }
 
     final case class DynamoConfig(region: Region)
 

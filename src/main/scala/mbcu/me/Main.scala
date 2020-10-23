@@ -18,7 +18,10 @@ object Main extends App {
     case Right(value) => {
       val x = Repositories.fromConfig(value)
 
-      val z = x.certivStorage.put(S3Path("aaa", "b.txt"), new File("README.md")).runToFuture(ExecutorsConfig.ecIO)
+//      val z = x.certivStorage.put(S3Path("aaa", "b.txt"), new File("README.md")).runToFuture(ExecutorsConfig.ecIO)
+      val z = x.certivStorage
+        .putDeleteIAMTestFile(value.repositoryConfig.s3Config.iamTestFilePath)
+        .runToFuture(ExecutorsConfig.ecIO)
       Await.result(z, 3.seconds)
 //      x.certivStorage.Application.fromConfig.run(value)
 

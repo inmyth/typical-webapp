@@ -12,12 +12,19 @@ private[services] abstract class FileRepo(scheduler: Scheduler) {
 
   def put(target: S3Path, file: java.io.File): Task[Done]
 
+  def putDeleteIAMTestFile(target: S3Path): Task[Done]
+
 }
 
 object FileRepo {
 
-  final case class S3Path(folder: String, file: String) {
-    override def toString: String = s"$folder/$file"
+  final case class S3Path(folders: Option[Seq[String]], file: String) {
+
+    override def toString: String =
+      folders match {
+        case Some(value) => s"""${(value :+ "").mkString("/")}$file"""
+        case _           => file
+      }
   }
 
   def s3(scheduler: Scheduler, s3: S3, s3Config: S3Config): FileRepo = new CertivFileStorage(s3, s3Config)(scheduler)

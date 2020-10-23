@@ -25,7 +25,33 @@
 - Conf doesn't store credentials. Use IDEA's AWS Tools to store them. 
     - credentials are only used in development, in production IAM role is used
     - AWS client is smart enough to look for these credentials
-
+- S3 IAM test
+    - to test if put object permission is ok, we put a file and delete it. 
+    - the IAM policy needs to have delete object permission for this file only.
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "s3:PutObject",
+            ],
+            "Resource": "arn:aws:s3:::dev-certiv/*"
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Allow",
+            "Action": [
+                "s3:DeleteObject"
+            ],
+            "Resource": "arn:aws:s3:::dev-certiv/thisisiamtestfiletocreateanddelete.txt"
+        }
+    ]
+}
+``` 
+ 
 ## TODOS
 
 - [x] reconfigure config
