@@ -51,7 +51,35 @@
     ]
 }
 ``` 
- 
+- DynamoDB IAM test
+    - put a empty entry to the table and delete it
+    - requires a put permission on the table and delete permission on the test item
+
+```
+{
+    "Sid": "VisualEditor0",
+    "Effect": "Allow",
+    "Action": "dynamodb:DeleteItem",
+    "Resource": "arn:aws:dynamodb:us-east-1:162207319863:table/proto-lambda-scalajs",
+    "Condition": {
+        "ForAllValues:StringEquals": {
+            "dynamodb:LeadingKeys": "thisisiamtestitem"
+        }
+    }
+},
+{
+    "Sid": "VisualEditor1",
+    "Effect": "Allow",
+    "Action": [
+        "dynamodb:PutItem"
+    ],
+    "Resource": [
+        "arn:aws:dynamodb:us-east-1:162207319863:table/proto-lambda-scalajs",
+    ]
+}
+``` 
+
+
 ## TODOS
 
 - [x] reconfigure config
