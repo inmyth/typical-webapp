@@ -39,11 +39,11 @@ object Config {
 
   object RepositoryConfig {
 
-    final case class S3Config(region: Region, bucket: Bucket, iamTestFileName: String) {
-      val iamTestFilePath = S3Path(None, iamTestFileName)
+    final case class S3Config(region: Region, bucket: Bucket, iamTestTargetKey: String, iamTestFile: java.io.File) {
+      val iamTestFilePath = S3Path(None, iamTestTargetKey)
     }
 
-    final case class DynamoConfig(region: Region)
+    final case class DynamoConfig(region: Region, tableName: String, testKey: String)
 
     final case class SQLConfig(region: Region)
 
@@ -66,7 +66,7 @@ object Config {
   final case class Repositories(config: Config) {
 
     val certivDynamo: CertivDynamoRepository =
-      CertivDynamoRepository.inMem(config.executorsConfig.computationScheduler.ec)
+      CertivDynamoRepository.inMem(config.executorsConfig.computationScheduler.ec, config.repositoryConfig.dynamoConfig)
 
     val certivStorage: CertivFileRepository = {
       val ec     = ExecutorsConfig.ecIO

@@ -14,7 +14,8 @@ import monix.execution.Scheduler
 private[persistence] object CertivS3Impl {}
 
 private[persistence] class CertivS3Impl(s3: S3, s3Config: S3Config)(implicit scheduler: Scheduler)
-    extends CertivFileRepository(scheduler) {
+    extends CertivFileRepository(scheduler)
+    with AWSPing[Task] {
 
   val bucket: Bucket = s3Config.bucket
 
@@ -23,11 +24,13 @@ private[persistence] class CertivS3Impl(s3: S3, s3Config: S3Config)(implicit sch
       _ <- Task { s3.put(bucket, target.toString, file) }
     } yield Done
 
-  override def putDeleteIAMTestFile(target: S3Path): Task[Done] =
+  override def testAccessAndIAMPermission(): Task[Done] = {
     for {
-      _ <- put(target, new File("README.md"))
+      _ <- put(s3Config.iamTestFilePath, s3Config.iamTestFile)
       - <- Task {
-        s3.deleteObject(new DeleteObjectRequest(bucket.name, target.toString))
+        s3.deleteObject(new DeleteObjectRequest(bucket.name, s3Config.iamTestFilePath.toString))
       }
     } yield Done
+  }
+
 }

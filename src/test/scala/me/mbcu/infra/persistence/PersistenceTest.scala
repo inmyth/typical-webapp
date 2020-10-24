@@ -11,8 +11,8 @@ class PersistenceTest extends AsyncFlatSpec with TestConfig {
   implicit val ec = config.executorsConfig.computationScheduler.ec
 
   val repo     = Repositories.fromConfig(config).certivDynamo
-  val userId   = User.Id(1)
-  val userName = User.UserName("martin")
+  val userId   = User.MyId("a")
+  val userName = Some(User.Name("martin"))
   val user     = usermanagement.User(userId, userName)
 
   behavior of "Certiv Dynamo Repository"
@@ -24,7 +24,7 @@ class PersistenceTest extends AsyncFlatSpec with TestConfig {
   }
 
   it should "be able to find user by username" in {
-    val task = repo.getByUserName(userName)
+    val task = repo.getByUserName(userName.get)
     val z    = task.runToFuture
     z map { p => assert(p.get.userName === userName) }
   }

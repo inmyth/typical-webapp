@@ -12,8 +12,8 @@ class ServicesTest extends AsyncFlatSpec with TestConfig {
   implicit val ec = config.executorsConfig.computationScheduler.ec
 
   val services = Services.fromConfig.run(config)
-  val userId   = User.Id(1)
-  val userName = User.UserName("martin")
+  val userId   = User.MyId("a")
+  val userName = Some(User.Name("martin"))
   val user     = usermanagement.User(userId, userName)
 
   behavior of "Default Repository"

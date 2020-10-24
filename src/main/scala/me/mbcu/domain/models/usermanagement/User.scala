@@ -1,10 +1,11 @@
 package me.mbcu.domain.models.usermanagement
 
-case class User(id: User.Id, userName: User.UserName)
+case class User(id: User.MyId, userName: Option[User.Name])
 
 object User {
 
-  final case class Id(value: Int)          extends AnyVal
-  final case class UserName(value: String) extends AnyVal
+  final case class MyId(value: String) extends AnyVal
+  final case class Name(value: String) extends AnyVal
+  final case class City(value: String) extends AnyVal
 
 }

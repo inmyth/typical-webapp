@@ -12,8 +12,6 @@ private[services] abstract class FileRepo(scheduler: Scheduler) {
 
   def put(target: S3Path, file: java.io.File): Task[Done]
 
-  def putDeleteIAMTestFile(target: S3Path): Task[Done]
-
 }
 
 object FileRepo {

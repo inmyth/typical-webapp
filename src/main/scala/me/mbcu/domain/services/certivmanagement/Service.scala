@@ -7,8 +7,8 @@ trait Service[F[_]] {
 
   def insert(user: User): F[Done]
 
-  def get(id: User.Id): F[User]
+  def get(id: User.MyId): F[User]
 
-  def changeUserName(id: User.Id, newName: User.UserName): F[Done]
+  def changeUserName(id: User.MyId, newName: User.Name): F[Done]
 
 }

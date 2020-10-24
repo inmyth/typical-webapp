@@ -17,7 +17,7 @@ final class Default private[certivmanagement] (dynamoRepo: DynamoRepo, fileRepo:
 
   override def insert(user: User): Task[Done] = dynamoRepo.insert(user)
 
-  override def get(id: User.Id): Task[User] =
+  override def get(id: User.MyId): Task[User] =
     for {
       maybeUser <- dynamoRepo.get(id)
       user <- maybeUser match {
@@ -26,10 +26,10 @@ final class Default private[certivmanagement] (dynamoRepo: DynamoRepo, fileRepo:
       }
     } yield user
 
-  override def changeUserName(id: User.Id, newName: User.UserName): Task[Done] =
+  override def changeUserName(id: User.MyId, newName: User.Name): Task[Done] =
     for {
       user  <- get(id)
-      clone <- Task.now(user.copy(id, userName = newName))
+      clone <- Task.now(user.copy(id, userName = Some(newName)))
       _     <- dynamoRepo.insert(clone)
     } yield Done
 
