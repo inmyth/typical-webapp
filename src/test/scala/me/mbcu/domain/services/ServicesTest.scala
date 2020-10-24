@@ -1,10 +1,10 @@
 package me.mbcu.domain.services
 
-import mbcu.me.config.Config.ExecutorsConfig.ComputationScheduler
-import mbcu.me.config.Config.{Config, EnvConfig, ExecutorsConfig, Services}
-import mbcu.me.domain.models.usermanagement
-import mbcu.me.domain.models.usermanagement.User
-import mbcu.me.domain.services.UserManagementError
+import me.mbcu.config.Config.ExecutorsConfig.ComputationScheduler
+import me.mbcu.config.Config.{Config, EnvConfig, ExecutorsConfig, Services}
+import me.mbcu.domain.models.usermanagement
+import me.mbcu.domain.models.usermanagement.User
+import me.mbcu.domain.services.UserManagementError
 import org.scalatest.AsyncFlatSpec
 
 class ServicesTest extends AsyncFlatSpec {

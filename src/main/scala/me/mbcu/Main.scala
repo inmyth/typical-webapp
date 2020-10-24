@@ -1,7 +1,7 @@
-package mbcu.me
+package me.mbcu
 
-import mbcu.me.config.Config.ExecutorsConfig.ComputationScheduler
-import mbcu.me.config.Config._
+import me.mbcu.config.Config.ExecutorsConfig.ComputationScheduler
+import me.mbcu.config.Config._
 
 object Main extends App {
 

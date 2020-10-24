@@ -1,9 +1,9 @@
-package mbcu.me.domain.services.usermanagement
+package me.mbcu.domain.services.usermanagement
 
-import mbcu.me.domain.models.usermanagement.User
-import mbcu.me.domain.models.usermanagement.User.UserName
-import mbcu.me.domain.shared.Done
-import mbcu.me.infra.persistence.FakeUserDb
+import me.mbcu.domain.models.usermanagement.User
+import me.mbcu.domain.models.usermanagement.User.UserName
+import me.mbcu.domain.shared.Done
+import me.mbcu.infra.persistence.FakeUserDb
 import monix.eval.Task
 import monix.execution.Scheduler
 

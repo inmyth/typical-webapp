@@ -1,4 +1,4 @@
-package mbcu.me.domain.services.usermanagement
+package me.mbcu.domain.services.usermanagement
 
 sealed trait Error extends Throwable
 private[usermanagement] object Error {

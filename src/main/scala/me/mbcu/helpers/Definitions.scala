@@ -1,4 +1,4 @@
-package mbcu.me.helpers
+package me.mbcu.helpers
 
 import cats.data.WriterT
 import monix.eval.Task

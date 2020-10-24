@@ -1,8 +1,8 @@
-package mbcu.me.infra.persistence
+package me.mbcu.infra.persistence
 
-import mbcu.me.domain.models.usermanagement.User
-import mbcu.me.domain.services.UserRepository
-import mbcu.me.domain.shared.Done
+import me.mbcu.domain.models.usermanagement.User
+import me.mbcu.domain.services.UserRepository
+import me.mbcu.domain.shared.Done
 import monix.eval.Task
 import monix.execution.Scheduler
 
