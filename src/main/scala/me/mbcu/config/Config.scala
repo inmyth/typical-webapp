@@ -1,12 +1,13 @@
-package mbcu.me.config
+package me.mbcu.config
 
 import awscala.Region
 import awscala.s3.{Bucket, S3}
 import cats.data.Reader
-import mbcu.me.config.Config.EnvConfig.RepoMode
-import mbcu.me.config.Config.RepositoryConfig.{DynamoConfig, InMemConfig, S3Config, SQLConfig}
-import mbcu.me.domain.services.certivmanagement.FileRepo.S3Path
-import mbcu.me.domain.services.{CertivDynamoRepository, CertivFileRepository, CertivManagement}
+import me.mbcu.domain.services.certivmanagement.FileRepo.S3Path
+import me.mbcu.config.Config.EnvConfig.RepoMode
+import me.mbcu.config.Config.RepositoryConfig.{DynamoConfig, InMemConfig, S3Config, SQLConfig}
+import me.mbcu.domain.services.certivmanagement.FileRepo.S3Path
+import me.mbcu.domain.services.{CertivDynamoRepository, CertivFileRepository, CertivManagement}
 import monix.eval.Task
 import monix.execution.ExecutionModel.AlwaysAsyncExecution
 import monix.execution.Scheduler

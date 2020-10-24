@@ -1,12 +1,12 @@
 package me.mbcu
 
-import mbcu.me.config.Config.Config
+import me.mbcu.config.Config.Config
 
 trait TestConfig {
 
   import pureconfig._
   import pureconfig.generic.auto._
-  import mbcu.me.config.ConfUtils._
+  import me.mbcu.config.ConfUtils._
 
   val testConf =
     """

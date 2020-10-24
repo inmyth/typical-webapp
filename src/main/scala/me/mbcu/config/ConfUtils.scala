@@ -1,4 +1,4 @@
-package mbcu.me.config
+package me.mbcu.config
 
 import awscala.Region
 import awscala.s3.Bucket

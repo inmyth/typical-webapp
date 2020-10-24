@@ -1,12 +1,12 @@
 package me.mbcu.infra.persistence
 
-import mbcu.me.domain.models.usermanagement
+import me.mbcu.domain.models.usermanagement
 import me.mbcu.TestConfig
+import me.mbcu.config.Config.Repositories
+import me.mbcu.domain.models.usermanagement.User
 import org.scalatest._
 
 class PersistenceTest extends AsyncFlatSpec with TestConfig {
-  import mbcu.me.config.Config._
-  import mbcu.me.domain.models.usermanagement.User
 
   implicit val ec = config.executorsConfig.computationScheduler.ec
 

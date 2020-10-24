@@ -1,19 +1,18 @@
-package mbcu.me
+package me.mbcu
 
 import java.io.File
 
-import mbcu.me.config.Config.{Config, ExecutorsConfig, Repositories}
-import mbcu.me.domain.services.certivmanagement.FileRepo.S3Path
 import pureconfig._
 import pureconfig.generic.auto._
-import mbcu.me.config.ConfUtils._
 
 import scala.concurrent.Await
 import scala.concurrent.duration.DurationInt
+import me.mbcu.config.Config.ExecutorsConfig.ComputationScheduler
+import me.mbcu.config.ConfUtils._
+import me.mbcu.config.Config._
 
 object Main extends App {
 
-  println(a)
   val config = ConfigSource.default.load[Config]
 
   config match {

@@ -1,7 +1,7 @@
-package mbcu.me.domain.services.certivmanagement
+package me.mbcu.domain.services.certivmanagement
 
-import mbcu.me.domain.models.usermanagement.User
-import mbcu.me.domain.shared.Done
+import me.mbcu.domain.models.usermanagement.User
+import me.mbcu.domain.shared.Done
 import monix.eval.Task
 import monix.execution.Scheduler
 

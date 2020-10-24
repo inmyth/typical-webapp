@@ -1,11 +1,11 @@
-package mbcu.me.domain
+package me.mbcu.domain
 
 package object services {
 
-  type CertivManagement[F[_]] = mbcu.me.domain.services.certivmanagement.Service[F]
+  type CertivManagement[F[_]] = me.mbcu.domain.services.certivmanagement.Service[F]
   val CertivManagement: certivmanagement.Implementations.type = certivmanagement.Implementations
 
-  type CertivManagementError = mbcu.me.domain.services.certivmanagement.Error
+  type CertivManagementError = me.mbcu.domain.services.certivmanagement.Error
 
   type CertivDynamoRepository = certivmanagement.DynamoRepo
   val CertivDynamoRepository = certivmanagement.DynamoRepo

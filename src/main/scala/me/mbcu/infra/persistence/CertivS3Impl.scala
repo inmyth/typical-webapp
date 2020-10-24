@@ -1,13 +1,13 @@
-package mbcu.me.infra.persistence
+package me.mbcu.infra.persistence
 
 import java.io.File
 
 import awscala.s3.{Bucket, S3, S3Object}
 import com.amazonaws.services.s3.model.DeleteObjectRequest
-import mbcu.me.config.Config.RepositoryConfig.S3Config
-import mbcu.me.domain.services.CertivFileRepository
-import mbcu.me.domain.services.certivmanagement.FileRepo.S3Path
-import mbcu.me.domain.shared.Done
+import me.mbcu.config.Config.RepositoryConfig.S3Config
+import me.mbcu.domain.services.CertivFileRepository
+import me.mbcu.domain.services.certivmanagement.FileRepo.S3Path
+import me.mbcu.domain.shared.Done
 import monix.eval.Task
 import monix.execution.Scheduler
 

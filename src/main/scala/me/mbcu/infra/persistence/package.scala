@@ -1,4 +1,4 @@
-package mbcu.me.infra
+package me.mbcu.infra
 
 package object persistence {
 

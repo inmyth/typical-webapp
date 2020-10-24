@@ -1,4 +1,4 @@
-package mbcu.me.domain.services.certivmanagement
+package me.mbcu.domain.services.certivmanagement
 
 sealed trait Error extends Throwable
 private[certivmanagement] object Error {

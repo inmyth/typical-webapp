@@ -1,4 +1,4 @@
-package mbcu.me.domain.models.usermanagement
+package me.mbcu.domain.models.usermanagement
 
 case class User(id: User.Id, userName: User.UserName)
 
