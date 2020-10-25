@@ -1,4 +1,4 @@
-package me.mbcu.infra.persistence
+package me.mbcu.domain.services.certivmanagement
 
 import me.mbcu.domain.shared.Done
 

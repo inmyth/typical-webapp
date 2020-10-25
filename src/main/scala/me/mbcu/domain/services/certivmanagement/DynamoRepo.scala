@@ -8,7 +8,8 @@ import me.mbcu.infra.persistence.{CertivDynamo, CertivDynamoInMem}
 import monix.eval.Task
 import monix.execution.Scheduler
 
-private[services] abstract class DynamoRepo(scheduler: Scheduler, dynamoConfig: DynamoConfig) {
+private[services] abstract class DynamoRepo(scheduler: Scheduler, dynamoConfig: DynamoConfig) extends AWSPing[Task] {
+
   def put(user: User): Task[Done]
 
 }

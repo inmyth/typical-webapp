@@ -9,6 +9,7 @@ import me.mbcu.config.Config.EnvConfig.{InMem, Real, RepoMode}
 import me.mbcu.config.Config.RepositoryConfig.{DynamoConfig, InMemConfig, S3Config, SQLConfig}
 import me.mbcu.domain.services.certivmanagement.FileRepo.S3Path
 import me.mbcu.domain.services.{CertivDynamoRepository, CertivFileRepository, CertivManagement}
+import me.mbcu.domain.shared.Done
 import monix.eval.Task
 import monix.execution.ExecutionModel.AlwaysAsyncExecution
 import monix.execution.Scheduler
@@ -62,6 +63,7 @@ object Config {
 
   object Repositories {
     val fromConfig: Reader[Config, Repositories] = Reader(Repositories(_))
+
   }
 
   final case class Repositories(config: Config) {
@@ -85,6 +87,12 @@ object Config {
       val s3     = S3.at(region)
       CertivFileRepository.s3(ec, s3, config.repositoryConfig.s3Config)
     }
+
+    def testIAMPermissionAndAccess(): Task[Done] =
+      for {
+        _ <- certivDynamo.testAccessAndIAMPermission()
+        _ <- certivStorage.testAccessAndIAMPermission()
+      } yield Done
 
   }
 

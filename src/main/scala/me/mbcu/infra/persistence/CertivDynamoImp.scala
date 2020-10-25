@@ -14,8 +14,7 @@ import scala.jdk.CollectionConverters.{MapHasAsJava, MutableMapHasAsJava}
 private[persistence] object CertivDynamoImp {}
 
 private[persistence] class CertivDynamoImp(db: DynamoDB, dynamoConfig: DynamoConfig)(implicit scheduler: Scheduler)
-    extends CertivDynamoRepository(scheduler, dynamoConfig)
-    with AWSPing[Task] {
+    extends CertivDynamoRepository(scheduler, dynamoConfig) {
 
   val tableName: String = dynamoConfig.tableName
   val key: String       = "myId"

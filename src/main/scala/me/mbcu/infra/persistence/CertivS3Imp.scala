@@ -14,8 +14,7 @@ import monix.execution.Scheduler
 private[persistence] object CertivS3Imp {}
 
 private[persistence] class CertivS3Imp(s3: S3, s3Config: S3Config)(implicit scheduler: Scheduler)
-    extends CertivFileRepository(scheduler)
-    with AWSPing[Task] {
+    extends CertivFileRepository(scheduler) {
 
   val bucket: Bucket = s3Config.bucket
 

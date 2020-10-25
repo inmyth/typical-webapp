@@ -15,8 +15,7 @@ private[persistence] object CertivDynamoInMemImp {
 }
 
 private[persistence] class CertivDynamoInMemImp(dynamoConfig: DynamoConfig)(implicit scheduler: Scheduler)
-    extends CertivDynamoRepository(scheduler, dynamoConfig)
-    with AWSPing[Task] {
+    extends CertivDynamoRepository(scheduler, dynamoConfig) {
   import CertivDynamoInMemImp._
 
   override def put(user: User): Task[Done] =

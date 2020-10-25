@@ -26,9 +26,13 @@ trait TestConfig {
       |    s-3-config {
       |        region : "us-east-1"
       |        bucket : "dev-certiv"
+      |        iam-test-target-key : "thisisiamtestfiletocreateanddelete.txt"
+      |        iam-test-file: "README.md"
       |    }
       |    dynamo-config {
       |        region : "us-east-1"
+      |        table-name : "proto-lambda-scalajs"
+      |        iam-test-key : "thisisiamtestitem"
       |    }
       |    sql-config {
       |        region : "us-east-1"

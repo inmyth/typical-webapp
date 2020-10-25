@@ -8,7 +8,7 @@ import me.mbcu.infra.persistence.CertivFileStorage
 import monix.eval.Task
 import monix.execution.Scheduler
 
-private[services] abstract class FileRepo(scheduler: Scheduler) {
+private[services] abstract class FileRepo(scheduler: Scheduler) extends AWSPing[Task] {
 
   def put(target: S3Path, file: java.io.File): Task[Done]
 
