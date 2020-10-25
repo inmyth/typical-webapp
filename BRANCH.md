@@ -11,7 +11,7 @@
     - role
     - view
 - crud for admin
-
+- IAM checks (check if any repo or service has sufficient permission for the operation prior to deployment)
 
 ## How To Start
 
@@ -179,4 +179,5 @@ IAM group policy
 - [] implement req / resp
 - [x] in mem file repo 
 - [x] selection between in-mem or real happens in repositories config
+- [x] repository IAM permission checks
  
