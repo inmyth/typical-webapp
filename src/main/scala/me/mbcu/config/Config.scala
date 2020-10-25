@@ -1,10 +1,11 @@
 package me.mbcu.config
 
 import awscala.Region
+import awscala.dynamodbv2.DynamoDB
 import awscala.s3.{Bucket, S3}
 import cats.data.Reader
 import me.mbcu.domain.services.certivmanagement.FileRepo.S3Path
-import me.mbcu.config.Config.EnvConfig.RepoMode
+import me.mbcu.config.Config.EnvConfig.{InMem, Real, RepoMode}
 import me.mbcu.config.Config.RepositoryConfig.{DynamoConfig, InMemConfig, S3Config, SQLConfig}
 import me.mbcu.domain.services.certivmanagement.FileRepo.S3Path
 import me.mbcu.domain.services.{CertivDynamoRepository, CertivFileRepository, CertivManagement}
@@ -43,7 +44,7 @@ object Config {
       val iamTestFilePath = S3Path(None, iamTestTargetKey)
     }
 
-    final case class DynamoConfig(region: Region, tableName: String, testKey: String)
+    final case class DynamoConfig(region: Region, tableName: String, iamTestKey: String)
 
     final case class SQLConfig(region: Region)
 
@@ -65,8 +66,18 @@ object Config {
 
   final case class Repositories(config: Config) {
 
-    val certivDynamo: CertivDynamoRepository =
-      CertivDynamoRepository.inMem(config.executorsConfig.computationScheduler.ec, config.repositoryConfig.dynamoConfig)
+    val certivDynamo: CertivDynamoRepository = {
+      val dynamoConfig = config.repositoryConfig.dynamoConfig
+      config.envConfig.repoMode match {
+        case InMem =>
+          val ec = config.executorsConfig.computationScheduler.ec
+          CertivDynamoRepository.inMem(ec, dynamoConfig)
+        case Real =>
+          val ddb = DynamoDB.at(dynamoConfig.region)
+          val ec  = ExecutorsConfig.ecIO
+          CertivDynamoRepository.ddb(ec, ddb, dynamoConfig)
+      }
+    }
 
     val certivStorage: CertivFileRepository = {
       val ec     = ExecutorsConfig.ecIO

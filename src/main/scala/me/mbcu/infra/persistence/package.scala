@@ -2,10 +2,13 @@ package me.mbcu.infra
 
 package object persistence {
 
-  type CertivDynamoInMem = persistence.CertivDynamoInMemImpl
-  val CertivDynamoInMem = persistence.CertivDynamoInMemImpl
+  type CertivDynamoInMem = persistence.CertivDynamoInMemImp
+  val CertivDynamoInMem = persistence.CertivDynamoInMemImp
 
-  type CertivFileStorage = persistence.CertivS3Impl
-  val CertivFileStorage = persistence.CertivS3Impl
+  type CertivDynamo = persistence.CertivDynamoImp
+  val certivDynamo = persistence.CertivDynamoImp
+
+  type CertivFileStorage = persistence.CertivS3Imp
+  val CertivFileStorage = persistence.CertivS3Imp
 
 }

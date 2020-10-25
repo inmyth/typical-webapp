@@ -15,22 +15,6 @@ object Implementations {
 final class Default private[certivmanagement] (dynamoRepo: DynamoRepo, fileRepo: FileRepo)(implicit ec: Scheduler)
     extends Service[Task] {
 
-  override def insert(user: User): Task[Done] = dynamoRepo.insert(user)
-
-  override def get(id: User.MyId): Task[User] =
-    for {
-      maybeUser <- dynamoRepo.get(id)
-      user <- maybeUser match {
-        case Some(value) => Task.now(value)
-        case None        => Task.raiseError(Error.NotFound)
-      }
-    } yield user
-
-  override def changeUserName(id: User.MyId, newName: User.Name): Task[Done] =
-    for {
-      user  <- get(id)
-      clone <- Task.now(user.copy(id, userName = Some(newName)))
-      _     <- dynamoRepo.insert(clone)
-    } yield Done
+  override def insert(user: User): Task[Done] = dynamoRepo.put(user)
 
 }

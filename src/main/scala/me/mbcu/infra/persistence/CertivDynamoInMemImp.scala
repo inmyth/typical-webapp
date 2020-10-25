@@ -10,32 +10,25 @@ import monix.execution.Scheduler
 
 import scala.collection.concurrent.TrieMap
 
-private[persistence] object CertivDynamoInMemImpl {
+private[persistence] object CertivDynamoInMemImp {
   private val db: TrieMap[User.MyId, User] = TrieMap.empty
 }
 
-private[persistence] class CertivDynamoInMemImpl(dynamoConfig: DynamoConfig)(implicit scheduler: Scheduler)
+private[persistence] class CertivDynamoInMemImp(dynamoConfig: DynamoConfig)(implicit scheduler: Scheduler)
     extends CertivDynamoRepository(scheduler, dynamoConfig)
     with AWSPing[Task] {
-  import CertivDynamoInMemImpl._
+  import CertivDynamoInMemImp._
 
-  override def insert(user: User): Task[Done] =
+  override def put(user: User): Task[Done] =
     Task.now {
       db.put(user.id, user)
       Done
     }
 
-  override def get(id: User.MyId): Task[Option[User]] = Task.now(db.get(id))
-
-  override def getByUserName(userName: User.Name): Task[Option[User]] =
-    Task.now(db.collectFirst { case (_, user) if user.userName.nonEmpty && user.userName.get == userName ⇒ user })
-
-  def all(): Task[List[User]] = Task.now(db.values.toList)
-
   override def testAccessAndIAMPermission(): Task[Done] = {
-    val testId = MyId(dynamoConfig.testKey)
+    val testId = MyId(dynamoConfig.iamTestKey)
     for {
-      _ <- insert(User(testId, None))
+      _ <- put(User(testId, None))
       _ <- Task.now { db -= testId }
     } yield Done
   }
