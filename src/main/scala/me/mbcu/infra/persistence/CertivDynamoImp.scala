@@ -9,7 +9,7 @@ import me.mbcu.domain.shared.Done
 import monix.eval.Task
 import monix.execution.Scheduler
 
-import scala.jdk.CollectionConverters.{MapHasAsJava, MutableMapHasAsJava}
+import collection.JavaConverters._
 
 private[persistence] object CertivDynamoImp {}
 
