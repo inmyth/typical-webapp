@@ -23,7 +23,7 @@
 
 ## Notes
 
-- Server can be abstracted away with Tapir while making controller portable. Controller should
+- Tapir CANNOT DO VERTX PARTIALSERVER Server can be abstracted away with Tapir while making controller portable. Controller should
     - deal with routes, query or path parameters
     - process header / jwt authentication
     - not deal with parameter validation, this should go to service (plus Tapir parameter validation cannot be formatted into json)

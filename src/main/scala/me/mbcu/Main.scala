@@ -36,18 +36,17 @@ object Main extends App {
 //  Await.result(y, DurationInt(3).second)
 
   case class AAAUser(name: String)
-  val AuthenticationErrorCode = 1001
 
   case class MyId(id: String)
 
   sealed trait ErrorInfo
-  case class NotFound(what: String)  extends ErrorInfo
-  case class AuthError(what: String) extends ErrorInfo
+  case class NotFound(what: String) extends ErrorInfo
+  case class AuthError(what: Int)   extends ErrorInfo
 
-  def auth(token: String): Future[Either[AuthError, AAAUser]] =
+  def auth(token: String): Future[Either[ErrorInfo, AAAUser]] =
     Future {
       if (token == "secret") Right(AAAUser("Spock"))
-      else Left(AuthError("1001"))
+      else Left(AuthError(1001))
     }
 
   implicit val codec: JsonValueCodec[MyId]       = JsonCodecMaker.make
@@ -67,15 +66,13 @@ object Main extends App {
     .errorOut(jsonBody[ErrorInfo])
     .serverLogicForCurrent(auth)
 
-  val anEndpoint: Endpoint[MyId, ErrorInfo, MyId, Any] =
-    secureEndpoint.endpoint.get
+  val anEndpoint =
+    secureEndpoint
       .in("hello")
       .in(query[MyId]("name"))
-      .errorOut(jsonBody[ErrorInfo])
       .out(jsonBody[MyId])
-      .serverLogic {
-        case (t, unit, id) => Future.successful[Either[(ErrorInfo, ErrorInfo), MyId]](Right(MyId(id)))
-      }
+      .serverLogicForCurrent(logic)
+//      .errorOut(jsonBody[ErrorInfo])
 
   def logic(s: MyId): Future[Either[ErrorInfo, MyId]] =
     Future {
@@ -85,27 +82,9 @@ object Main extends App {
       }
     }
 
-  val attach = anEndpoint.route(logic)
-
-  // extend the base endpoint to define (potentially multiple) proper endpoints, define the rest of the server logic
-  val secureHelloWorld1WithLogic = secureEndpoint.get
-    .in("hello1")
-    .in(query[String]("salutation"))
-    .out(stringBody)
-    .serverLogic {
-      case (user, salutation) => {
-        println("asadadsa")
-        Future(Right(s"$salutation, ${user.name}!"))
-      }
-    }
-
-  val at2 = secureHelloWorld1WithLogic.endpoint.route {
-    case (u, salutation) => {
-      println(u)
-      println(salutation)
-      Future(Right(s"$salutation"))
-    }
-  }
+  val attach = anEndpoint.endpoint
+    .errorOut(jsonBody[ErrorInfo])
+    .route { case logic => logi Future.successful(Right(MyId("aaa"))) }
 
   attach(router) // your endpoint is now attached to the router, and the route has been created
 //  at2(router)
