@@ -12,6 +12,7 @@
     - view
 - crud for admin
 - IAM checks (check if any repo or service has sufficient permission for the operation prior to deployment)
+- separate controller and server
 
 ## How To Start
 
@@ -22,6 +23,11 @@
 
 ## Notes
 
+- Server can be abstracted away with Tapir while making controller portable. Controller should
+    - deal with routes, query or path parameters
+    - process header / jwt authentication
+    - not deal with parameter validation, this should go to service (plus Tapir parameter validation cannot be formatted into json)
+    - return response  
 - Conf doesn't store credentials. Use IDEA's AWS Tools to store them. 
     - credentials are only used in development, in production IAM role is used
     - AWS client is smart enough to look for these credentials

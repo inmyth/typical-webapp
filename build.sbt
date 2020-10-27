@@ -12,7 +12,12 @@ libraryDependencies += "com.github.pureconfig" %% "pureconfig" % "0.14.0"
 libraryDependencies += "com.github.seratch" %% "awscala-s3"       % "0.8.+"
 libraryDependencies += "com.github.seratch" %% "awscala-dynamodb" % "0.8.+"
 // Server + Typed endpoints
-libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-core"         % "0.17.0-M5"
-libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-vertx-server" % "0.17.0-M5"
+libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-core"           % "0.17.0-M5"
+libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-vertx-server"   % "0.17.0-M5"
+libraryDependencies += "com.softwaremill.sttp.tapir" %% "tapir-jsoniter-scala" % "0.17.0-M5"
+libraryDependencies ++= Seq(
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-core"   % "2.6.2",
+  "com.github.plokhotnyuk.jsoniter-scala" %% "jsoniter-scala-macros" % "2.6.2" % "provided"
+)
 // Tests
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.1.0" % Test
