@@ -2,6 +2,7 @@ package me.mbcu
 
 import java.io.File
 
+import akka.http.scaladsl.server.{Directive, Route}
 import awscala.Region
 import awscala.dynamodbv2.{DynamoDB, Table}
 import com.amazonaws.services.dynamodbv2.model.{AttributeValue, DeleteItemRequest}
@@ -27,6 +28,9 @@ import scala.concurrent.Future
 import sttp.tapir.json.jsoniter._
 import com.github.plokhotnyuk.jsoniter_scala.macros._
 import com.github.plokhotnyuk.jsoniter_scala.core._
+import sttp.capabilities.WebSockets
+import sttp.capabilities.akka.AkkaStreams
+import sttp.tapir.server.akkahttp.{AkkaHttpServerOptions, EndpointToAkkaServer}
 import sttp.tapir.server.{PartialServerEndpoint, ServerEndpoint}
 object Main extends App {
 //  val config = ConfigSource.default.loadOrThrow[Config]
@@ -67,7 +71,7 @@ object Main extends App {
     .serverLogicForCurrent(auth)
 
   val anEndpoint =
-    secureEndpoint
+    secureEndpoint.get
       .in("hello")
       .in(query[MyId]("name"))
       .out(jsonBody[MyId])
@@ -82,11 +86,22 @@ object Main extends App {
       }
     }
 
-  val attach = anEndpoint.endpoint
-    .errorOut(jsonBody[ErrorInfo])
-    .route { case logic => logi Future.successful(Right(MyId("aaa"))) }
+  val endpointA =
+    endpoint
+      .in(header[String]("X-AUTH-TOKEN"))
+      .in("hello")
+      .in(query[MyId]("name"))
+      .out(jsonBody[MyId])
+      .errorOut(jsonBody[ErrorInfo])
 
-  attach(router) // your endpoint is now attached to the router, and the route has been created
+  val atc = endpointA.route { v =>
+    Future {
+      if (v._1 == "secret" && v._2.id == "SPOCK") Right(MyId("SPOCK"))
+      else Left(AuthError(1001))
+    }
+  }
+
+  atc(router) // your endpoint is now attached to the router, and the route has been created
 //  at2(router)
   server.requestHandler(router).listenFuture(9000)
 
