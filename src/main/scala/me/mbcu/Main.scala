@@ -1,108 +1,100 @@
 package me.mbcu
 
-import java.io.File
-
-import akka.http.scaladsl.server.{Directive, Route}
-import awscala.Region
-import awscala.dynamodbv2.{DynamoDB, Table}
-import com.amazonaws.services.dynamodbv2.model.{AttributeValue, DeleteItemRequest}
-import com.github.plokhotnyuk.jsoniter_scala.core.JsonValueCodec
-import pureconfig._
-import pureconfig.generic.auto._
-
-import scala.concurrent.Await
-import scala.concurrent.duration.DurationInt
-import me.mbcu.config.Config.ExecutorsConfig.ComputationScheduler
-import me.mbcu.config.ConfUtils._
-import me.mbcu.config.Config._
-import me.mbcu.domain.services.certivmanagement.AWSPing
-import monix.eval.Task
-import sttp.tapir._
-import sttp.tapir.server.vertx._
+import cats.data.EitherT
+import com.github.plokhotnyuk.jsoniter_scala.core._
+import com.github.plokhotnyuk.jsoniter_scala.macros.JsonCodecMaker
 import io.vertx.scala.core.Vertx
-import io.vertx.scala.ext.web._
-import sttp.tapir.CodecFormat.TextPlain
+import io.vertx.scala.ext.web.Router
+import me.mbcu.config.Config.Config
+import monix.eval.Task
+import pureconfig.ConfigSource
+import sttp.tapir.json.jsoniter.jsonBody
+import sttp.tapir.server.vertx.{VertxEndpoint, VertxEndpointOptions}
+import sttp.tapir.{Codec, CodecFormat, Validator, endpoint, header, query}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import sttp.tapir.json.jsoniter._
-import com.github.plokhotnyuk.jsoniter_scala.macros._
-import com.github.plokhotnyuk.jsoniter_scala.core._
-import sttp.capabilities.WebSockets
-import sttp.capabilities.akka.AkkaStreams
-import sttp.tapir.server.akkahttp.{AkkaHttpServerOptions, EndpointToAkkaServer}
-import sttp.tapir.server.{PartialServerEndpoint, ServerEndpoint}
+import scala.util.Try
+import pureconfig._
+import pureconfig.generic.auto._
+import me.mbcu.config.ConfUtils._
 object Main extends App {
-//  val config = ConfigSource.default.loadOrThrow[Config]
-//  val ec = config.executorsConfig.computationScheduler.ec
-//  val x = Repositories.fromConfig(config)
-//  val y = x.testIAMPermissionAndAccess().runToFuture(ec)
+  val config      = ConfigSource.default.loadOrThrow[Config]
+  implicit val ec = config.executorsConfig.computationScheduler.ec
+//  val x      = Repositories.fromConfig(config)
+//  val y      = x.testIAMPermissionAndAccess().runToFuture(ec)
 //  Await.result(y, DurationInt(3).second)
 
-  case class AAAUser(name: String)
+//  import com.dslplatform.json._ // import pimping
+//  lazy implicit val dslJson = new DslJson[Any]()
+//
+//  final case class MyId(name: Option[String], id: Int)
+//  val os = new ByteArrayOutputStream()
+//  dslJson.encode(MyId(None, 3), os)
+//  println(os.toString)
 
   case class MyId(id: String)
-
+  case class MyToken(token: String)
+  case class MyOut(myId: MyId, myToken: MyToken)
   sealed trait ErrorInfo
-  case class NotFound(what: String) extends ErrorInfo
-  case class AuthError(what: Int)   extends ErrorInfo
+  case class NotFound(what: String)  extends ErrorInfo
+  case class AuthError(what: String) extends ErrorInfo
 
-  def auth(token: String): Future[Either[ErrorInfo, AAAUser]] =
-    Future {
-      if (token == "secret") Right(AAAUser("Spock"))
-      else Left(AuthError(1001))
-    }
+  implicit val myIdCodec: Codec[String, MyId, CodecFormat.TextPlain] = Codec.string
+    .map(MyId)(_.id)
+    .validate(Validator.pattern("^[A-Z].*").contramap(_.id))
 
   implicit val codec: JsonValueCodec[MyId]       = JsonCodecMaker.make
   implicit val eCodec: JsonValueCodec[ErrorInfo] = JsonCodecMaker.make
+  implicit val eCodec2: JsonValueCodec[MyToken]  = JsonCodecMaker.make
+  implicit val aaaa: JsonValueCodec[MyOut]       = JsonCodecMaker.make
 
-  implicit val myIdCodec: Codec[String, MyId, TextPlain] = Codec.string
-    .map(MyId)(_.id)
-    .validate(Validator.pattern("^[A-Z].*").contramap(_.id))
+  val anEndpoint =
+    endpoint
+      .in(header[String]("X-AUTH-TOKEN"))
+      .get
+      .in("hello")
+      .in(query[MyId]("name"))
+      .errorOut(jsonBody[ErrorInfo])
+      .out(jsonBody[MyOut])
+
+//  anEndpoint.route(p => p)
+  def jwt(token: String): Task[Either[ErrorInfo, MyToken]] =
+    Task {
+      token match {
+        case "secret" => Right(MyToken("secret"))
+        case _        => Left(AuthError("token not ok"))
+      }
+    }
+
+  def getMyId(myId: MyId, myToken: MyToken): Task[Either[ErrorInfo, MyOut]] =
+    Task {
+      myId match {
+        case x if x.id == "ABC" => Right(MyOut(myId, myToken))
+        case _                  => Left(NotFound("this user"))
+      }
+    }
+
+  import cats.implicits._
+
+  def logic(myId: MyId)(implicit token: Task[Either[ErrorInfo, MyToken]]) = {
+
+    val x = for {
+      a <- EitherT(token)
+      b <- EitherT(getMyId(myId, a))
+    } yield b
+    x.value.runToFuture
+  }
 
   implicit val options: VertxEndpointOptions = VertxEndpointOptions()
   val vertx                                  = Vertx.vertx()
   val server                                 = vertx.createHttpServer()
   val router                                 = Router.router(vertx)
 
-  val secureEndpoint: PartialServerEndpoint[AAAUser, Unit, ErrorInfo, Unit, Any, Future] = endpoint
-    .in(header[String]("X-AUTH-TOKEN"))
-    .errorOut(jsonBody[ErrorInfo])
-    .serverLogicForCurrent(auth)
+  val attach = anEndpoint.route(p => {
+    logic(p._2)(jwt(p._1))
+  })
 
-  val anEndpoint =
-    secureEndpoint.get
-      .in("hello")
-      .in(query[MyId]("name"))
-      .out(jsonBody[MyId])
-      .serverLogicForCurrent(logic)
-//      .errorOut(jsonBody[ErrorInfo])
-
-  def logic(s: MyId): Future[Either[ErrorInfo, MyId]] =
-    Future {
-      s match {
-        case x if x.id == "abc" => Right(MyId("abc"))
-        case _                  => Left(NotFound("this user"))
-      }
-    }
-
-  val endpointA =
-    endpoint
-      .in(header[String]("X-AUTH-TOKEN"))
-      .in("hello")
-      .in(query[MyId]("name"))
-      .out(jsonBody[MyId])
-      .errorOut(jsonBody[ErrorInfo])
-
-  val atc = endpointA.route { v =>
-    Future {
-      if (v._1 == "secret" && v._2.id == "SPOCK") Right(MyId("SPOCK"))
-      else Left(AuthError(1001))
-    }
-  }
-
-  atc(router) // your endpoint is now attached to the router, and the route has been created
-//  at2(router)
+  attach(router)
   server.requestHandler(router).listenFuture(9000)
-
 }
