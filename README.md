@@ -5,9 +5,10 @@ A typical structure to be used in web-app project.
 - Create easy-to-test template. 
 - Restrict the most FP stuff to use
     - Reader
+    - dedicated thread pool
     - (from here not so important)
     - Implicit conversion
-    - Either (probably dropped as it doesn't play well with Task)
+    - Either, EitherT
     - Writer (this is monadic logging)
 - Adheres to basic DDD
 - Simulates unstable network
@@ -76,8 +77,6 @@ Handling should be done on repository level (i.e result should be `[A Either Err
 - using first order type F[_]
 
 The benefit is unclear as realistically we can only expect F to be Future or Task. Each one requires specific environment (ExecutionContect for Future or Monix's Scheduler) which cannot be abstracted. 
-
-- EitherT only plays nice with Future not Task
 
 - [ddd](https://web.archive.org/web/20201014145232/https://terasolunaorg.github.io/guideline/1.0.x/en/Overview/ApplicationLayering.html) 
     - controller should belong in application
