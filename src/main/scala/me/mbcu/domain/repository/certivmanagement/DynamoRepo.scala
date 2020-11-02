@@ -1,20 +1,21 @@
-package me.mbcu.domain.services.certivmanagement
+package me.mbcu.domain.repository.certivmanagement
 
 import awscala.dynamodbv2.DynamoDB
 import me.mbcu.config.Config.RepositoryConfig.DynamoConfig
-import me.mbcu.domain.models.usermanagement.User
+import me.mbcu.domain.model.certivmanagement.User
+import me.mbcu.domain.repository.AWSPing
 import me.mbcu.domain.shared.Done
-import me.mbcu.infra.persistence.{CertivDynamo, CertivDynamoInMem}
 import monix.eval.Task
 import monix.execution.Scheduler
 
-private[services] abstract class DynamoRepo(scheduler: Scheduler, dynamoConfig: DynamoConfig) extends AWSPing[Task] {
+private[certivmanagement] abstract class DynamoRepo(scheduler: Scheduler, dynamoConfig: DynamoConfig)
+    extends AWSPing[Task] {
 
   def put(user: User): Task[Done]
 
 }
 
-object DynamoRepo {
+private[certivmanagement] object DynamoRepo {
   def inMem(scheduler: Scheduler, dynamoConfig: DynamoConfig): DynamoRepo =
     new CertivDynamoInMem(dynamoConfig)(scheduler)
 

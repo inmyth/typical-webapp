@@ -1,4 +1,4 @@
-package me.mbcu.domain.services.certivmanagement
+package me.mbcu.domain.repository
 
 import me.mbcu.domain.shared.Done
 

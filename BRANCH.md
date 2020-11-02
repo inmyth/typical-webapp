@@ -21,7 +21,6 @@
     - allows put object
     - restricts to one dev bucket  
 
-
 ## Notes
 
 - Tapir CANNOT DO VERTX PARTIALSERVER so one endpoint must include everything including header/jwt auth. Server can be abstracted away with Tapir while making controller portable. Controller should
@@ -42,6 +41,8 @@
 - CORS
     - need to have explicit front-end url in CorsHandler.create
     - need to have allowHeader("Authorization"), the rest should be copied from martiplai
+- DDD
+    - project structure is based on https://terasolunaorg.github.io/guideline/1.0.x/en/Overview/ApplicationLayering.html#infrastructure-layer
 ```
 {
     "Version": "2012-10-17",

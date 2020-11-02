@@ -1,20 +1,19 @@
-package me.mbcu.infra.persistence
+package me.mbcu.domain.repository.certivmanagement
 
 import me.mbcu.config.Config.RepositoryConfig.DynamoConfig
-import me.mbcu.domain.models.usermanagement.User
-import me.mbcu.domain.models.usermanagement.User.MyId
-import me.mbcu.domain.services.CertivDynamoRepository
+import me.mbcu.domain.model.certivmanagement.User
+import me.mbcu.domain.model.certivmanagement.User.MyId
 import me.mbcu.domain.shared.Done
 import monix.eval.Task
 import monix.execution.Scheduler
 
 import scala.collection.concurrent.TrieMap
 
-private[persistence] object CertivDynamoInMemImp {
+private[certivmanagement] object CertivDynamoInMemImp {
   private val db: TrieMap[User.MyId, User] = TrieMap.empty
 }
 
-private[persistence] class CertivDynamoInMemImp(dynamoConfig: DynamoConfig)(implicit scheduler: Scheduler)
+private[certivmanagement] class CertivDynamoInMemImp(dynamoConfig: DynamoConfig)(implicit scheduler: Scheduler)
     extends CertivDynamoRepository(scheduler, dynamoConfig) {
   import CertivDynamoInMemImp._
 

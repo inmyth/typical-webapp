@@ -1,4 +1,4 @@
-package me.mbcu.domain.models.usermanagement
+package me.mbcu.domain.model.certivmanagement
 
 case class User(id: User.MyId, userName: Option[User.Name])
 

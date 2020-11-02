@@ -1,19 +1,18 @@
-package me.mbcu.infra.persistence
+package me.mbcu.domain.repository.certivmanagement
 
 import java.io.File
 
-import awscala.s3.{Bucket, S3, S3Object}
+import awscala.s3.{Bucket, S3}
 import com.amazonaws.services.s3.model.DeleteObjectRequest
 import me.mbcu.config.Config.RepositoryConfig.S3Config
-import me.mbcu.domain.services.CertivFileRepository
-import me.mbcu.domain.services.certivmanagement.FileRepo.S3Path
 import me.mbcu.domain.shared.Done
 import monix.eval.Task
 import monix.execution.Scheduler
+import me.mbcu.domain.repository.RepoHelper.S3Path
 
-private[persistence] object CertivS3Imp {}
+private[certivmanagement] object CertivS3Imp {}
 
-private[persistence] class CertivS3Imp(s3: S3, s3Config: S3Config)(implicit scheduler: Scheduler)
+private[certivmanagement] class CertivS3Imp(s3: S3, s3Config: S3Config)(implicit scheduler: Scheduler)
     extends CertivFileRepository(scheduler) {
 
   val bucket: Bucket = s3Config.bucket

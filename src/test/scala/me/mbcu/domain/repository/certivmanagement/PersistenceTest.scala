@@ -1,9 +1,9 @@
-package me.mbcu.infra.persistence
+package me.mbcu.domain.repository.certivmanagement
 
-import me.mbcu.domain.models.usermanagement
 import me.mbcu.TestConfig
 import me.mbcu.config.Config.Repositories
-import me.mbcu.domain.models.usermanagement.User
+import me.mbcu.domain.model.certivmanagement
+import me.mbcu.domain.model.certivmanagement.User
 import me.mbcu.domain.shared.Done
 import org.scalatest._
 
@@ -14,7 +14,7 @@ class PersistenceTest extends AsyncFlatSpec with TestConfig {
   val repo     = Repositories.fromConfig(config).certivDynamo
   val userId   = User.MyId("a")
   val userName = Some(User.Name("martin"))
-  val user     = usermanagement.User(userId, userName)
+  val user     = certivmanagement.User(userId, userName)
 
   behavior of "Certiv Dynamo Repository"
 

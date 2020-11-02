@@ -4,11 +4,11 @@ import awscala.Region
 import awscala.dynamodbv2.DynamoDB
 import awscala.s3.{Bucket, S3}
 import cats.data.Reader
-import me.mbcu.domain.services.certivmanagement.FileRepo.S3Path
 import me.mbcu.config.Config.EnvConfig.{InMem, Real, RepoMode}
 import me.mbcu.config.Config.RepositoryConfig.{DynamoConfig, InMemConfig, S3Config, SQLConfig}
-import me.mbcu.domain.services.certivmanagement.FileRepo.S3Path
-import me.mbcu.domain.services.{CertivDynamoRepository, CertivFileRepository, CertivManagement}
+import me.mbcu.domain.repository.RepoHelper.S3Path
+import me.mbcu.domain.repository.certivmanagement.{CertivDynamoRepository, CertivFileRepository}
+import me.mbcu.domain.service.CertivManagement
 import me.mbcu.domain.shared.Done
 import monix.eval.Task
 import monix.execution.ExecutionModel.AlwaysAsyncExecution
@@ -50,6 +50,7 @@ object Config {
     final case class SQLConfig(region: Region)
 
     final case class InMemConfig(failureProbability: Double)
+
   }
 
   final case class RepositoryConfig(
