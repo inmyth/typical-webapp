@@ -14,6 +14,7 @@
 - IAM checks (check if any repo or service has sufficient permission for the operation prior to deployment)
 - separate controller and server
 
+
 ## How To Start
 
 - Create IAM user with policy that 
@@ -23,17 +24,24 @@
 
 ## Notes
 
-- Tapir CANNOT DO VERTX PARTIALSERVER Server can be abstracted away with Tapir while making controller portable. Controller should
+- Tapir CANNOT DO VERTX PARTIALSERVER so one endpoint must include everything including header/jwt auth. Server can be abstracted away with Tapir while making controller portable. Controller should
     - deal with routes, query or path parameters
     - process header / jwt authentication
     - not deal with parameter validation, this should go to service (plus Tapir parameter validation cannot be formatted into json)
     - return response  
+- Current Tapir Vertx server
+    - has endpoint abstracted but without partial server
+    - supports CORS for (Vue SPA), pay attention to allowed headers
+    - has generic support for JSON response via jsoniter
 - Conf doesn't store credentials. Use IDEA's AWS Tools to store them. 
     - credentials are only used in development, in production IAM role is used
     - AWS client is smart enough to look for these credentials
 - S3 IAM test
     - to test if put object permission is ok, we put a file and delete it. 
     - the IAM policy needs to have delete object permission for this file only.
+- CORS
+    - need to have explicit front-end url in CorsHandler.create
+    - need to have allowHeader("Authorization"), the rest should be copied from martiplai
 ```
 {
     "Version": "2012-10-17",
@@ -180,9 +188,9 @@ IAM group policy
 - [x] restructured domain (user to certiv)
 - [x] AWS conf-type converter (ConfUtils)
 - [x] S3 put
-- [] implement server
+- [x] implement server
 - [] implement crud controller
-- [] implement req / resp
+- [x] implement req / resp
 - [x] in mem file repo 
 - [x] selection between in-mem or real happens in repositories config
 - [x] repository IAM permission checks

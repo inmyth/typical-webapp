@@ -5,6 +5,7 @@ import com.github.plokhotnyuk.jsoniter_scala.core._
 import com.github.plokhotnyuk.jsoniter_scala.macros.JsonCodecMaker
 import io.vertx.scala.core.Vertx
 import io.vertx.scala.ext.web.Router
+import io.vertx.scala.ext.web.handler.CorsHandler
 import me.mbcu.config.Config.Config
 import monix.eval.Task
 import pureconfig.ConfigSource
@@ -35,7 +36,7 @@ object Main extends App {
 
   case class MyId(id: String)
   case class MyToken(token: String)
-  case class MyOut(myId: MyId, myToken: MyToken)
+  case class MyOut[A](out: A)
   sealed trait ErrorInfo
   case class NotFound(what: String)  extends ErrorInfo
   case class AuthError(what: String) extends ErrorInfo
@@ -47,7 +48,72 @@ object Main extends App {
   implicit val codec: JsonValueCodec[MyId]       = JsonCodecMaker.make
   implicit val eCodec: JsonValueCodec[ErrorInfo] = JsonCodecMaker.make
   implicit val eCodec2: JsonValueCodec[MyToken]  = JsonCodecMaker.make
-  implicit val aaaa: JsonValueCodec[MyOut]       = JsonCodecMaker.make
+  implicit val aaaa: JsonValueCodec[MyOut[MyId]] = JsonCodecMaker.make
+
+  implicit def jwt(token: String): Task[Either[ErrorInfo, MyToken]] =
+    Task {
+      token match {
+        case "secret" => Right(MyToken("secret"))
+        case _        => Left(AuthError("token not ok"))
+      }
+    }
+
+  def getMyId(myId: MyId): Task[Either[ErrorInfo, MyOut[MyId]]] =
+    Task {
+      myId match {
+        case x if x.id == "ABC" => Right(MyOut(myId))
+        case _                  => Left(NotFound("this user"))
+      }
+    }
+
+  import cats.implicits._
+
+  abstract class AA {
+
+    def procHeader(token: String): Task[Either[AuthError, MyToken]] =
+      Task {
+        token match {
+          case "secret" => Right(MyToken("secret"))
+          case _        => Left(AuthError("token not ok"))
+        }
+
+      }
+  }
+
+  case class Alogic(token: String, myId: MyId) extends AA {
+    def logic =
+      for {
+        _ <- EitherT(procHeader(token))
+        b <- EitherT(getMyId(myId))
+      } yield b
+  }
+
+//  def logic(myId: MyId)(implicit token: Task[Either[ErrorInfo, MyToken]]) =
+//    for {
+//      _ <- EitherT(token)
+//      b <- EitherT(getMyId(myId))
+//    } yield b
+
+  implicit val options: VertxEndpointOptions = VertxEndpointOptions()
+  val vertx                                  = Vertx.vertx()
+  val server                                 = vertx.createHttpServer()
+  val router                                 = Router.router(vertx)
+  router
+    .route()
+    .handler(
+      CorsHandler
+        .create("http://localhost:8080") //  frontend SPA
+        .allowedMethod(io.vertx.core.http.HttpMethod.GET)
+        .allowedMethod(io.vertx.core.http.HttpMethod.POST)
+        .allowedMethod(io.vertx.core.http.HttpMethod.OPTIONS)
+        .allowCredentials(true)
+        .allowedHeader("Authorization") // this is a must
+        .allowedHeader("X-AUTH-TOKEN")
+        .allowedHeader("Access-Control-Allow-Method")
+        .allowedHeader("Access-Control-Allow-Origin")
+        .allowedHeader("Access-Control-Allow-Credentials")
+        .allowedHeader("Content-Type")
+    )
 
   val anEndpoint =
     endpoint
@@ -56,45 +122,12 @@ object Main extends App {
       .in("hello")
       .in(query[MyId]("name"))
       .errorOut(jsonBody[ErrorInfo])
-      .out(jsonBody[MyOut])
+      .out(jsonBody[MyOut[MyId]])
+      .route(
+        Alogic.tupled(_).logic.value.runToFuture
+      ) // this has to be placed after Vertx stuff Router.router otherwise 500
 
-//  anEndpoint.route(p => p)
-  def jwt(token: String): Task[Either[ErrorInfo, MyToken]] =
-    Task {
-      token match {
-        case "secret" => Right(MyToken("secret"))
-        case _        => Left(AuthError("token not ok"))
-      }
-    }
+  anEndpoint(router)
 
-  def getMyId(myId: MyId, myToken: MyToken): Task[Either[ErrorInfo, MyOut]] =
-    Task {
-      myId match {
-        case x if x.id == "ABC" => Right(MyOut(myId, myToken))
-        case _                  => Left(NotFound("this user"))
-      }
-    }
-
-  import cats.implicits._
-
-  def logic(myId: MyId)(implicit token: Task[Either[ErrorInfo, MyToken]]) = {
-
-    val x = for {
-      a <- EitherT(token)
-      b <- EitherT(getMyId(myId, a))
-    } yield b
-    x.value.runToFuture
-  }
-
-  implicit val options: VertxEndpointOptions = VertxEndpointOptions()
-  val vertx                                  = Vertx.vertx()
-  val server                                 = vertx.createHttpServer()
-  val router                                 = Router.router(vertx)
-
-  val attach = anEndpoint.route(p => {
-    logic(p._2)(jwt(p._1))
-  })
-
-  attach(router)
   server.requestHandler(router).listenFuture(9000)
 }
