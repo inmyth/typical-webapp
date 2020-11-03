@@ -1,11 +1,14 @@
 package me.mbcu.config
 
+import java.io.File
+
 import awscala.Region
 import awscala.dynamodbv2.DynamoDB
 import awscala.s3.{Bucket, S3}
 import cats.Id
 import cats.data.Reader
 import me.mbcu.app.VertxServer
+import me.mbcu.app.certivmanagement.CertivController
 import me.mbcu.config.Config.EnvConfig.{InMem, Real, RepoMode}
 import me.mbcu.config.Config.RepositoryConfig.{DynamoConfig, InMemConfig, S3Config, SQLConfig}
 import me.mbcu.domain.repository.RepoHelper.S3Path
@@ -15,6 +18,7 @@ import me.mbcu.domain.shared.Done
 import monix.eval.Task
 import monix.execution.ExecutionModel.AlwaysAsyncExecution
 import monix.execution.Scheduler
+import sttp.tapir.server.vertx.VertxEndpointOptions
 
 object Config {
 
@@ -116,16 +120,31 @@ object Config {
       CertivManagement.default(repositories.certivDynamo, repositories.certivStorage)(ecComp)
   }
 
-  object Application {
+  object Controllers {
 
-    val reader: Reader[Services, Application] = Reader(Application.apply)
-
-    val fromConfig: Reader[Config, Application] = Services.fromConfig andThen reader
-
-    def start(application: Application): Id[Unit] = VertxServer.setupServer run application.services
+    val reader: Reader[Services, Controllers] = Reader(Controllers.apply)
 
   }
 
-  final case class Application(services: Services)
+  final case class Controllers(services: Services) {
+    val options: VertxEndpointOptions = VertxEndpointOptions() // modifies upload dir, log name
+
+    val certivController = new CertivController(options, services)
+  }
+
+  object Application {
+
+    val fromConfig: Reader[Config, Application] = {
+      for {
+        services    <- Services.fromConfig
+        controllers <- Services.fromConfig andThen Controllers.reader
+      } yield Application(services, controllers)
+    }
+
+    def start(application: Application): Id[Unit] = VertxServer.setupServer run application
+
+  }
+
+  final case class Application(services: Services, controllers: Controllers)
 
 }

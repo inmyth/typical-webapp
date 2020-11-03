@@ -14,7 +14,6 @@
 - IAM checks (check if any repo or service has sufficient permission for the operation prior to deployment)
 - separate controller and server
 
-
 ## How To Start
 
 - Create IAM user with policy that 

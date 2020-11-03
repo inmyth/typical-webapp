@@ -5,26 +5,16 @@ import io.vertx.scala.core.Vertx
 import io.vertx.scala.ext.web.Router
 import io.vertx.scala.ext.web.handler.CorsHandler
 import me.mbcu.app.certivmanagement.CertivController
-import me.mbcu.config.Config.{EnvConfig, Services}
-import sttp.tapir.server.vertx.VertxEndpointOptions
+import me.mbcu.config.Config.{Application, EnvConfig}
 
 object VertxServer {
-  val options: VertxEndpointOptions = VertxEndpointOptions()
-  val vertx                         = Vertx.vertx()
-  val server                        = vertx.createHttpServer()
-  val router                        = Router.router(vertx)
+  val vertx  = Vertx.vertx()
+  val server = vertx.createHttpServer()
+  val router = Router.router(vertx)
 
-  private val servicesReader: Reader[Services, Services] = Reader(p => p)
-  val setupServer: Reader[Services, Unit] =
-    for {
-      services <- servicesReader
-      _      = setupCORS(services.config.envConfig)
-      certiv = new CertivController(options, services)
-      _      = setupEndpoints(certiv)
-      _      = startServer(services.config.envConfig)
-    } yield Unit
+  private val applicationReader: Reader[Application, Application] = Reader(p => p)
 
-  def setupCORS(envConfig: EnvConfig): Unit = {
+  private def setupCORS(envConfig: EnvConfig): Unit = {
     router
       .route()
       .handler(
@@ -43,10 +33,19 @@ object VertxServer {
       )
   }
 
-  def setupEndpoints(certivController: CertivController): Unit = {
+  private def setupEndpoints(certivController: CertivController): Unit =
     certivController.endpoints.foreach(p => p(router))
-  }
 
-  def startServer(envConfig: EnvConfig): Unit = server.requestHandler(router).listen(envConfig.backendPort)
+  private def startServer(envConfig: EnvConfig): Unit =
+    server.requestHandler(router).listen(envConfig.backendPort)
+
+  val setupServer: Reader[Application, Unit] =
+    for {
+      app <- applicationReader
+      _      = setupCORS(app.services.config.envConfig)
+      certiv = app.controllers.certivController
+      _      = setupEndpoints(certiv)
+      _      = startServer(app.services.config.envConfig)
+    } yield ()
 
 }
