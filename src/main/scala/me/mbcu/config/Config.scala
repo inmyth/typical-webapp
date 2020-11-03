@@ -3,7 +3,9 @@ package me.mbcu.config
 import awscala.Region
 import awscala.dynamodbv2.DynamoDB
 import awscala.s3.{Bucket, S3}
+import cats.Id
 import cats.data.Reader
+import me.mbcu.app.VertxServer
 import me.mbcu.config.Config.EnvConfig.{InMem, Real, RepoMode}
 import me.mbcu.config.Config.RepositoryConfig.{DynamoConfig, InMemConfig, S3Config, SQLConfig}
 import me.mbcu.domain.repository.RepoHelper.S3Path
@@ -37,7 +39,7 @@ object Config {
     final object Real  extends RepoMode
   }
 
-  final case class EnvConfig(repoMode: RepoMode)
+  final case class EnvConfig(repoMode: RepoMode, frontendPort: Int, backendPort: Int)
 
   object RepositoryConfig {
 
@@ -119,6 +121,8 @@ object Config {
     val reader: Reader[Services, Application] = Reader(Application.apply)
 
     val fromConfig: Reader[Config, Application] = Services.fromConfig andThen reader
+
+    def start(application: Application): Id[Unit] = VertxServer.setupServer run application.services
 
   }
 
